@@ -158,16 +158,6 @@ Janitor: heap 87 MB | loaded 3/102 | pins 1 | menus 18 | tags 2 | outVeh 1
 
 During a long session `heap` and `pins` should level off instead of climbing indefinitely.
 
-## Help us test
-
-Please try the following and report what you find:
-
-- [ ] Walk up to a property and open the purchase menu. Walk away and confirm it unloads (`loaded` drops in the debug log).
-- [ ] Buy an apartment, enter it, change its style (IPL), and leave.
-- [ ] Use 2, 6 and 10-car garages: store a car, leave, come back, and check mods and colors.
-- [ ] Uninstall the DLC of a saved car and enter the garage (other cars should still load, and the XML should stay).
-- [ ] Open the closet/wardrobe, garage, phone (mechanic/insurance) and real estate menus. Check that the Back button works and clothing previews update while browsing.
-- [ ] Play 1–2 hours entering and leaving several properties and watch `heap` and `pins`.
 
 ## Reporting problems
 
