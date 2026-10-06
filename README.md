@@ -1,83 +1,133 @@
-# SPA III – Unofficial Community Update of SPA II (Single Player Apartment)
+<div align="center">
 
-**A performance and stability update of SPA II for GTA V Legacy (Premium Edition), ported to ScriptHookVDotNet 3 and LemonUI.**
+# 🏙️ SPA III
 
-> **Not affiliated with the original author.** SPA II was created by **Zettabyte Technology** (© 2015–2021). This is an unofficial, community-maintained update based on the original source. See [Credits and legal](#credits-and-legal).
+### Unofficial community update of **SPA II – Single Player Apartment**
+**Smoother performance · No more memory leak · Modern menus · Safer garage saves**
+
+![GTA V](https://img.shields.io/badge/GTA%20V-Legacy-green)
+![SHVDN](https://img.shields.io/badge/ScriptHookVDotNet-3.x-blue)
+![UI](https://img.shields.io/badge/UI-LemonUI%202.2-orange)
+![Status](https://img.shields.io/badge/status-community%20testing-yellow)
+![Online](https://img.shields.io/badge/GTA%20Online-not%20supported-red)
+
+</div>
+
+> **Not affiliated with the original author.** SPA II was created by **Zettabyte Technology** (© 2015–2021). This is an unofficial, fan-made update based on the original source, shared with full credit. See [Credits and legal](#-credits-and-legal).
+
+<!-- Add screenshots/GIFs here: purchase at the sign, apartment menu, garage with cars. -->
 
 ---
 
-## Status (please read)
+## 📑 Contents
+
+[Quick start](#-quick-start) · [Status](#-status) · [What's new](#-whats-new) · [Requirements](#-requirements) · [Installation](#-installation) · [Checking it loaded](#-checking-that-it-loaded) · [Troubleshooting](#-troubleshooting) · [Configuration](#%EF%B8%8F-configuration) · [Help us test](#-help-us-test) · [Reporting problems](#-reporting-problems) · [Known limitations](#-known-limitations) · [Building](#-building-from-source) · [Credits and legal](#-credits-and-legal)
+
+---
+
+## ⚡ Quick start
+
+1. Install **ScriptHookV** (official site) and **ScriptHookVDotNet 3.x nightly** in the game root, **matching your game build**.
+2. Copy the contents of the release folder into `scripts\` (see [Installation](#-installation)).
+3. Start the game in **story mode**. Don't press F4. Mods load by themselves.
+4. To **buy a property, go on foot to the "For Sale" sign in front of the building** and press **E**.
+
+That's it. If something doesn't work, jump to [Troubleshooting](#-troubleshooting).
+
+---
+
+## 📊 Status
 
 | | |
 |---|---|
-| ✅ **Confirmed** | The mod loads and runs in-game on the author's GTA V **Legacy** install. |
-| ⚠️ **Not guaranteed** | It has **not** been tested on every game build, every property, every garage or every menu. |
+| ✅ **Confirmed by the author** | Loads and runs on a GTA V **Legacy** install. Buying a property at its for-sale sign works. Several cars were stored in a garage and stayed saved. A 1+ hour session ran with no crashes and no FPS problems. |
+| ⚠️ **Not guaranteed** | Not tested on every game build, property, garage or menu. See [Help us test](#-help-us-test). |
 | ❌ **Not supported** | GTA Online, and the GTA V *Enhanced* edition (untested). |
 
 **Tested by the author on:**
 
 | Component | Version |
 |---|---|
+| Release | rev3 (based on SPA II 2.0.5) |
 | GTA V (Legacy) | `[FILL IN: right-click GTA5.exe → Properties → Details → Product version]` |
 | ScriptHookV | `[FILL IN: version of the ScriptHookV.dll you used]` |
 | ScriptHookVDotNet | v3.7.0-nightly.191 |
 
-Whether it works for you depends mostly on **ScriptHookV and SHVDN supporting your exact game build**. If they don't, no script mod will load, including this one. Please report your results (see [Reporting problems](#reporting-problems)) so the compatibility list can grow.
+Whether it works for you depends mostly on **ScriptHookV and SHVDN supporting your exact game build**. If they don't, no script mod loads, including this one.
+
+> There are no published benchmark numbers yet. The author reports smooth gameplay, and the `DebugMode` log (see [Configuration](#%EF%B8%8F-configuration)) lets anyone measure memory over time. Community results are welcome.
 
 ---
 
-## What was updated (everything that differs from SPA II 2.0.5)
+## ✨ What's new
 
-### Compatibility
-- Ported from **ScriptHookVDotNet 2 to ScriptHookVDotNet 3** (renamed natives, vehicle-mod API, tasks, props, cameras, settings).
-- Replaced **INMNativeUI** with **LemonUI 2.2** for all menus and the purchase banner, to avoid crashes when opening the closet and garage menus.
-- Replaced **Metadata.dll** (it patched game memory to unlock decorators, which is fragile across builds) with a managed registry for the garage vehicle IDs.
-- Updated to **iFruitAddon2 v3.1.1** (the SHVDN3 build) for the phone contacts.
-- Removed a write to game memory (`Game.Globals(...).SetInt(1)`). Its index was only valid up to build 2060 and could corrupt memory on newer builds.
+### At a glance
 
-### Performance and memory leak
-- **Distance-based loading.** A property only has its menus, for-sale sign and doors while you are near it. It loads at **200 m or less** and unloads beyond **250 m**. The gap between the two values prevents load/unload flickering. Both are configurable.
+| Area | SPA II 2.0.5 | This update |
+|---|---|---|
+| Game scripting API | ScriptHookVDotNet 2 | **ScriptHookVDotNet 3** |
+| Menus | INMNativeUI | **LemonUI 2.2** |
+| Interiors | Pinned in memory forever | **Released when no longer needed** |
+| IPLs | Requested, never removed | **Tracked and removed with their interior** |
+| Menus, signs and doors | Created for every property at startup | **Only for properties within 200 m** |
+| Scaleform movies | 11 loaded at startup, never freed | **Loaded on demand, freed afterwards** |
+| Work per frame | Repeated for every property | **Once per frame, nearby properties only** |
+| Garage save files | Written directly to the target | **Written safely, validated, `.bak` kept** |
+| A saved car whose DLC is missing | Could break loading | **Skipped and logged, XML kept** |
+| Startup failure in one part | Could stop the whole mod | **Isolated and logged** |
+
+### 🚀 Performance and memory leak
+- **Distance-based loading.** A property has its menus, for-sale sign and doors only while you are near it. It loads at **200 m or less** and unloads beyond **250 m**. The gap prevents load/unload flickering. Both values are configurable.
 - **A property you are inside is never unloaded**, even though its interior is far from its door. Nothing unloads while a menu is open.
-- **Interiors are released.** The original pinned every visited interior in memory (`PIN_INTERIOR_IN_MEMORY`) and never released it, and never removed the IPLs it requested. They are now tracked and released after they stop being needed. On re-entry the mod waits (with a timeout) for the interior to be ready, so you don't fall through the floor.
-- **Scaleforms load on demand.** The original loaded 11 scaleform movies at startup and never freed them.
-- **Much less work per frame.** Interior logic ran once per building, every frame. It now runs once per frame, only over nearby properties. The config file is no longer read from disk every frame.
-- **Blips are no longer duplicated** on each refresh.
-- **Periodic cleanup** removes dead vehicles from internal lists and purges stale IDs. The managed garbage collector runs only when the heap passes a threshold (or every N minutes), and never during menus.
-- **Safer log.** Capped at 2 MB, and repeated identical errors are collapsed instead of being written every frame.
-- **Clean shutdown.** Menus, props, blips, interior pins and scaleforms are released when scripts are unloaded.
+- **Interiors are released.** The original pinned every visited interior (`PIN_INTERIOR_IN_MEMORY`) and never unpinned it. They are now tracked and released after they stop being needed. On re-entry the mod waits (with a timeout) for the interior to be ready, so you don't fall through the floor.
+- **Scaleforms load on demand** instead of all at startup.
+- **Much less per-frame work.** Interior logic ran once per property, every frame. It now runs once per frame. The config file is no longer read from disk every frame.
+- **No duplicated blips** on refresh.
+- **Periodic cleanup** removes dead vehicles from internal lists and purges stale IDs. The garbage collector runs only past a heap threshold (or every N minutes) and never during menus.
+- **Safer log.** Capped at 2 MB, with repeated identical errors collapsed.
+- **Clean shutdown.** Menus, props, blips, interior pins and scaleforms are released when scripts unload.
 
-### Stability and save safety
-- **Vehicle XML is written safely.** Written to a temporary file, validated, then swapped in, with a `.bak` copy kept. A corrupted XML is recovered from the backup, and a corrupt file no longer hides your other cars.
-- **Missing DLC vehicles no longer break the garage.** If a car's model is not available, the mod logs it and carries on, and **keeps your XML** so the car returns when the DLC does.
-- **Per-vehicle error handling.** One broken car no longer stops the rest from loading.
-- **Saving a car is safer.** The old file is deleted only after the new one is saved, and the camera, HUD and screen fade are restored if something fails midway.
-- **No more indefinite waits.** Model loading, IPL swapping and interior loading now have time limits. The for-sale sign spawner no longer recurses without limit.
-- **Fixed enter/exit cameras.** The apartment and garage camera transitions passed a Boolean where SHVDN3 expects a number, which turns `True` into `-1`. They now pass `1`/`0`.
-- **Fault-tolerant startup.** Each startup step is isolated. A failure in one part (phone, wardrobe, missing folder) is logged and does not stop the properties from loading. Missing `scripts\SPA II`, `Garages` and `Sounds` folders are created automatically.
-- **Startup is logged**, so you can confirm the mod is running (see [Checking that it loaded](#checking-that-it-loaded)).
+### 🛡️ Stability and save safety
+- **Vehicle XML is written safely**: temporary file, validation, then swap, with a `.bak` copy. A corrupted file is recovered from the backup, and one bad file no longer hides your other cars.
+- **Missing DLC vehicles don't break the garage.** The mod logs it and carries on, **keeping your XML** so the car comes back when the DLC does.
+- **Per-vehicle error handling.** One broken car doesn't stop the rest from loading.
+- **Safer saving.** The old file is deleted only after the new one is saved. If something fails midway, the camera, HUD and screen fade are restored.
+- **No more indefinite waits.** Model loading, IPL swapping and interior loading have time limits.
+- **Fixed enter/exit cameras.** The apartment and garage camera transitions passed a Boolean where SHVDN3 expects a number (`True` became `-1`). They now pass `1`/`0`.
+- **Fault-tolerant startup.** Each startup step is isolated. A failure in one part is logged and doesn't stop the properties from loading. Missing `scripts\SPA II`, `Garages` and `Sounds` folders are created automatically.
+- **Startup is logged**, so you can confirm the mod is running.
 
-### Unchanged on purpose
-Garage save files keep the same XML format, so **existing SPA II saves remain compatible**. Back up `scripts\SPA II` before the first run anyway. The DLL, folder and log names still say "SPA II" for the same reason.
+### 🔧 Compatibility
+- Ported to **ScriptHookVDotNet 3** (natives, vehicle-mod API, tasks, props, cameras, settings).
+- **LemonUI** replaces INMNativeUI, avoiding crashes when opening the closet and garage menus.
+- **Metadata.dll** (which patched game memory to unlock decorators and was fragile across builds) is replaced by a managed registry for garage vehicle IDs.
+- **iFruitAddon2 v3.1.1** (the SHVDN3 build) for the phone contacts.
+- Removed a write to game memory (`Game.Globals`). Its index was only valid up to build 2060 and could corrupt memory on newer builds.
+
+### 💾 Unchanged on purpose
+Garage saves keep the same XML format, so **existing SPA II saves remain compatible**. Back up `scripts\SPA II` before the first run anyway. DLL, folder and log names still say "SPA II" for that reason.
 
 ---
 
-## Requirements
+## 📦 Requirements
 
 | Dependency | Notes |
 |---|---|
-| **GTA V Legacy** | Use a build that ScriptHookV and SHVDN support. |
-| **ScriptHookV** (`ScriptHookV.dll` + `dinput8.dll`) | Download from the official site: <https://dev-c.com/GTAV/scripthookv>. It must support **your exact** game build. At the time of writing the page lists v3889.0 for Legacy 1.0.3889.0. |
-| **ScriptHookVDotNet 3.x** | Tested with **v3.7.0-nightly.191**: <https://github.com/scripthookvdotnet/scripthookvdotnet-nightly/releases>. The `.asi` and both `.dll` files must be from the **same** version. |
+| **GTA V Legacy** | A build that ScriptHookV and SHVDN support. |
+| **ScriptHookV** (`ScriptHookV.dll` + `dinput8.dll`) | Official site: <https://dev-c.com/GTAV/scripthookv>. It must support **your exact** game build. At the time of writing the page lists v3889.0 for Legacy 1.0.3889.0. |
+| **ScriptHookVDotNet 3.x** | Tested with **v3.7.0-nightly.191**: <https://github.com/scripthookvdotnet/scripthookvdotnet-nightly/releases>. The `.asi` and both `.dll` files must come from the **same** version. |
 | **LemonUI.SHVDN3** 2.2 | Included in the release package. |
 | **iFruitAddon2 v3.1.1** | Included in the release package. The old SHVDN2 version will not work. |
 | **.NET Framework 4.8** | Included in an up-to-date Windows 10/11. |
-| **Visual C++ Redistributable 2019 x64** | Required by ScriptHookV / SHVDN. |
+| **Visual C++ Redistributable 2019 x64** | Needed by ScriptHookV / SHVDN. |
 
-**No longer needed:** `INMNativeUI.dll`, `Metadata.dll`, `ScriptHookVDotNet2.dll` as a dependency of this mod.
+**No longer needed:** `INMNativeUI.dll` and `Metadata.dll`.
 
 > ScriptHookV is © Alexander Blade and is **not included** in this repository or release. Download it from the official site.
 
-## Installation
+---
+
+## 🔧 Installation
 
 **Game root folder (next to `GTA5.exe`)**
 
@@ -105,31 +155,48 @@ scripts\
 
 1. **Back up** `scripts\SPA II` and your GTA V save games.
 2. In `scripts`, **delete** any old `SPAII.dll`, `INMNativeUI.dll`, `Metadata.dll` and the old `iFruitAddon2.dll`.
-3. Copy the **contents** of the release folder `To your scripts folder!!!` into `scripts` (not the folder itself, so the result is `scripts\SPAII.dll`).
-4. Delete every old `ScriptHookVDotNet*` file from the game root and copy the SHVDN files fresh, so all of them are the same version.
-5. Start the game, load a **story mode** save, and wait until you are in control of your character.
+3. Copy the **contents** of the release folder `To your scripts folder!!!` into `scripts`. Don't copy the folder itself: the result must be `scripts\SPAII.dll`.
+4. Delete every old `ScriptHookVDotNet*` file from the game root and copy the SHVDN files fresh, so they are all the same version.
+5. Start the game, load a **story mode** save, and wait until you control your character.
 
 `modconfig.ini` is created on the first run in `scripts\SPA II`.
 
-### Important notes
-- **Do not enter GTA Online** with ScriptHookV installed. ScriptHookV closes the game when you go online. Remove `dinput8.dll` to play online.
-- **F4 opens the SHVDN console. It does not load or reload mods.** Mods load automatically when the game starts. Pressing F4 closed the game on a setup with mismatched files, so avoid it. To test changes, close and reopen the game instead of reloading scripts.
-- Don't run two ASI loaders at once (for example `dinput8.dll` together with another loader renamed `xinput1_4.dll`).
+### ⚠️ Important
+- **Never enter GTA Online** with ScriptHookV installed. Remove `dinput8.dll` to play online.
+- **F4 opens the SHVDN console. It does not load or reload mods.** Mods load automatically at game start. To test changes, close and reopen the game rather than reloading scripts.
+- Don't run **two ASI loaders** at once (for example `dinput8.dll` together with another loader renamed `xinput1_4.dll`). Don't delete the `xinput1_4.dll` in `C:\Windows\System32`; that's a normal system file.
 
 ---
 
-## Checking that it loaded
+## ✅ Checking that it loaded
 
 1. Open the map. Property icons should be scattered across it.
-2. Walk up to a property for sale. A help prompt to open the purchase menu should appear.
+2. **To buy, go to the "For Sale" sign in front of the building**, on foot (not in a vehicle), and stand right next to it (within about 1.5 m). A help prompt appears; press the action key (**E** on keyboard). The building's door is only for entering properties you already own.
 3. Open `SPA II.log` in the game root folder. It should contain:
    ```
    [STARTUP] SPA II iniciado | jogo <version> | predios N | blips N
    [STARTUP] primeiro tick executado: o script esta rodando
    ```
-   (The log messages are in Portuguese.) If there is no `[STARTUP]` line, SHVDN did not load the mod. Lines saying `etapa '...' falhou` describe what failed and why.
+   (The log messages are in Portuguese.)
 
-## Configuration
+---
+
+## 🩺 Troubleshooting
+
+| Symptom | Likely cause and fix |
+|---|---|
+| **Nothing loads, no icons on the map** | ScriptHookV or SHVDN doesn't support your game build, or the files are mixed versions. Check your game version, update both, and recopy **all** `ScriptHookVDotNet*` files from the same package. |
+| **No `[STARTUP]` lines in `SPA II.log`** | SHVDN didn't load the mod. Check `ScriptHookVDotNet.log` and `ScriptHookV.log` in the game root. |
+| **Lines saying `etapa '...' falhou`** | One startup part failed. The message below it says which and why. Please report it. |
+| **Game closes when pressing F4** | F4 is the SHVDN console, and it crashes on mismatched or unsupported SHVDN files. Don't press it, and fix the versions. You can set `ConsoleKeyBinding=None` in `ScriptHookVDotNet.ini`. |
+| **A message asks you to check the script and for updates** | Usually a version mismatch. Update ScriptHookV and SHVDN to versions that support your game build. |
+| **Can't buy a property** | You must be at the **for-sale sign**, on foot, within ~1.5 m. The door doesn't sell. |
+| **Icons show but the purchase prompt never appears** | Look for a line starting with `LoadRuntime` in `SPA II.log` and report it. |
+| **Game closes when going online** | Expected with ScriptHookV. Remove `dinput8.dll` to play online. |
+
+---
+
+## ⚙️ Configuration
 
 `scripts\SPA II\modconfig.ini`, section `[PERFORMANCE]` (created on first run):
 
@@ -148,18 +215,46 @@ InteriorReadyTimeoutMs=4000
 IplTimeoutMs=5000
 ```
 
-Invalid values are corrected automatically (for example, `LoadDistance` is always kept below `UnloadDistance`). To save more memory, lower `UnloadDistance`. If you get stutter when arriving in a dense area, raise `SweepIntervalMs` or lower `MaxLoadsPerSweep`.
+| Setting | What it does |
+|---|---|
+| `UnloadDistance` / `LoadDistance` | Metres at which a property unloads / loads. `LoadDistance` is always kept below `UnloadDistance`. |
+| `SweepIntervalMs` | How often distances are checked. |
+| `MaxLoadsPerSweep` | Max properties loaded per check (smooths spikes in dense areas). |
+| `InteriorReleaseGraceSec` | Seconds an unused interior stays pinned before release. |
+| `JanitorIntervalSec` | How often the cleanup runs. |
+| `GcThresholdMB` / `ForceGcMinutes` | When to force a garbage collection. |
+| `*TimeoutMs` | Time limits for model, interior and IPL loading. |
 
-Set `DebugMode=True` in the `[SETTING]` section to log a status line about every 30 seconds:
+Invalid values are corrected automatically. To save more memory, lower `UnloadDistance`. If you get stutter arriving in a dense area, raise `SweepIntervalMs` or lower `MaxLoadsPerSweep`.
+
+**Measuring memory:** set `DebugMode=True` in the `[SETTING]` section. About every 30 seconds the log records:
 
 ```
 Janitor: heap 87 MB | loaded 3/102 | pins 1 | menus 18 | tags 2 | outVeh 1
 ```
 
-During a long session `heap` and `pins` should level off instead of climbing indefinitely.
+During a long session `heap` and `pins` should level off instead of climbing.
 
+---
 
-## Reporting problems
+## 🧪 Help us test
+
+✅ = confirmed by the author. Everything else is still open: please try it and report what you find.
+
+- [x] ✅ Buy a property at its for-sale sign through the purchase menu.
+- [x] ✅ Store several cars in a garage, leave, and confirm they are saved and present.
+- [x] ✅ Play 1+ hour with no crashes and no FPS problems.
+- [ ] Check that stored cars keep their **mods and colors** after leaving and re-entering the garage.
+- [ ] Walk away from a property and confirm it unloads (`loaded` drops in the `DebugMode` log).
+- [ ] Enter a property you own, **change its style (IPL)**, and leave.
+- [ ] Use 2, 6 and 10-car garages.
+- [ ] Uninstall the DLC of a saved car and enter the garage (other cars should load, and the XML should stay).
+- [ ] Open the closet/wardrobe, phone (mechanic/insurance) and real estate menus. Check that Back works and clothing previews update while browsing.
+- [ ] Play 1–2 hours with `DebugMode=True` and post the first and last `Janitor:` lines (`heap`, `pins`).
+
+---
+
+## 🐛 Reporting problems
 
 Open an issue and include:
 - Your **game build** (GTA5.exe → Properties → Details → Product version).
@@ -167,16 +262,22 @@ Open an issue and include:
 - `SPA II.log`, `ScriptHookVDotNet.log` and `ScriptHookV.log` (all in the game root).
 - What you were doing when it happened, and which menu if one was unresponsive.
 
-## Known limitations
+---
+
+## 📌 Known limitations
 
 - Property blips stay on the map for all properties (they are the "for sale" icons). What is unloaded is menus, signs, props, interior pins and IPLs.
-- The menu layer maps the old menu events onto LemonUI. Two behaviours differ on purpose: the selection-changed event does not fire when a menu opens, and the menu-closed event fires only when the player backs out (not when the code switches menus).
+- The menu layer maps the old menu events onto LemonUI. Two behaviours differ on purpose: the selection-changed event doesn't fire when a menu opens, and the menu-closed event fires only when the player backs out (not when code switches menus).
 - Some original game logic was left as it was, even where it looks odd.
 - Not tested on the Enhanced edition.
 
-## Building from source
+---
 
-The source is **VB.NET** targeting .NET Framework 4.8. Reference DLLs are in `SPAII/lib` (ScriptHookVDotNet3, LemonUI.SHVDN3, iFruitAddon2). Open `SPAII/SPAII.vbproj` in Visual Studio and build. New files are in `SPAII/Core`:
+## 🛠️ Building from source
+
+The source is **VB.NET** targeting .NET Framework 4.8. Reference DLLs are in `SPAII/lib` (ScriptHookVDotNet3, LemonUI.SHVDN3, iFruitAddon2). Open `SPAII/SPAII.vbproj` in Visual Studio and build.
+
+New code lives in `SPAII/Core`:
 
 | File | Purpose |
 |---|---|
@@ -187,7 +288,9 @@ The source is **VB.NET** targeting .NET Framework 4.8. Reference DLLs are in `SP
 | `LemonCompat.vb` | LemonUI bridge for the original menu code |
 | `VehicleCompat.vb`, `MetadataCompat.vb` | SHVDN3 vehicle API and the `Metadata.dll` replacement |
 
-## Credits and legal
+---
+
+## 🙏 Credits and legal
 
 - **SPA II** (Single Player Apartment Remastered): original work by **Zettabyte Technology**, © 2015–2021. All credit for the mod itself goes to the original author.
 - Libraries: [ScriptHookVDotNet](https://github.com/scripthookvdotnet/scripthookvdotnet) (crosire, Kagikn and contributors), [LemonUI](https://github.com/LemonUIbyLemon/LemonUI) (LemonUIbyLemon), [iFruitAddon2](https://github.com/Bob74/iFruitAddon2) (Bob74), ScriptHookV (Alexander Blade).
