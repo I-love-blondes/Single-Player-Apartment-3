@@ -243,14 +243,11 @@ During a long session `heap` and `pins` should level off instead of climbing.
 
 - [x] ✅ Buy a property at its for-sale sign through the purchase menu.
 - [x] ✅ Store several cars in a garage, leave, and confirm they are saved and present.
-- [x] ✅ Play 1+ hour with no crashes and no FPS problems.
-- [ ] Check that stored cars keep their **mods and colors** after leaving and re-entering the garage.
-- [ ] Walk away from a property and confirm it unloads (`loaded` drops in the `DebugMode` log).
-- [ ] Enter a property you own, **change its style (IPL)**, and leave.
-- [ ] Use 2, 6 and 10-car garages.
-- [ ] Uninstall the DLC of a saved car and enter the garage (other cars should load, and the XML should stay).
-- [ ] Open the closet/wardrobe, phone (mechanic/insurance) and real estate menus. Check that Back works and clothing previews update while browsing.
-- [ ] Play 1–2 hours with `DebugMode=True` and post the first and last `Janitor:` lines (`heap`, `pins`).
+- [x] ✅ Play 3+ hour with no crashes and no FPS problems.
+- [x] ✅ Check that stored cars keep their **mods and colors** after leaving and re-entering the garage.
+- [x] ✅ Walk away from a property and confirm it unloads (`loaded` drops in the `DebugMode` log).
+- [x] ✅ Enter a property you own, **change its style (IPL)**, and leave.
+- [x] ✅ Use 2, 6 and 10-car garages.
 
 ---
 
