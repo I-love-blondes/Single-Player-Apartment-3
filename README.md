@@ -249,15 +249,7 @@ During a long session `heap` and `pins` should level off instead of climbing.
 - [x] ✅ Enter a property you own, **change its style (IPL)**, and leave.
 - [x] ✅ Use 2, 6 and 10-car garages.
 
----
 
-## 🐛 Reporting problems
-
-Open an issue and include:
-- Your **game build** (GTA5.exe → Properties → Details → Product version).
-- Your **ScriptHookV** and **SHVDN** versions.
-- `SPA II.log`, `ScriptHookVDotNet.log` and `ScriptHookV.log` (all in the game root).
-- What you were doing when it happened, and which menu if one was unresponsive.
 
 ---
 
