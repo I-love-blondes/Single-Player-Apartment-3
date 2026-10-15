@@ -240,25 +240,6 @@ Janitor: heap 87 MB | loaded 3/102 | pins 1 | menus 18 | tags 2 | outVeh 1
 
 During a long session `heap` and `pins` should level off instead of climbing.
 
----
-
-## 🧪 Help us test
-
-✅ = confirmed by the author. Everything else is still open: please try it and report what you find.
-
-- [x] ✅ Buy a property at its for-sale sign through the purchase menu.
-- [x] ✅ Store several cars in a garage, leave, and confirm they are saved and present.
-- [x] ✅ Play 1+ hour with no crashes and no FPS problems.
-- [ ] **Move a car to an empty slot** (garage menu → car → Move → empty slot) and confirm only one menu is open afterwards.
-- [ ] **Swap two cars** and confirm they trade places.
-- [ ] **Fill a garage completely**, drive one of its cars out and park it back: it should return to its original slot.
-- [ ] Check that stored cars keep their **mods and colors** after leaving and re-entering the garage.
-- [ ] Walk away from a property and confirm it unloads (`loaded` drops in the `DebugMode` log).
-- [ ] Enter a property you own, **change its style (IPL)**, and leave.
-- [ ] Use 2, 6 and 10-car garages.
-- [ ] Uninstall the DLC of a saved car and enter the garage (other cars should load, and the XML should stay).
-- [ ] Open the closet/wardrobe, phone (mechanic/insurance) and real estate menus. Check that Back works and clothing previews update while browsing.
-- [ ] Play 1–2 hours with `DebugMode=True` and post the first and last `Janitor:` lines (`heap`, `pins`).
 
 ---
 
