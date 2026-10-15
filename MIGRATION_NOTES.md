@@ -59,3 +59,11 @@ Requer ScriptHookVDotNet **3.x** que suporte a sua build do jogo (SHVDN2 deve se
 - **Inicializacao a prova de falhas**: cada etapa do construtor tem try/catch proprio e as pastas `scripts\SPA II`, `Garages` e `Sounds` sao criadas se faltarem. Antes, qualquer excecao no construtor impedia o mod de iniciar (sem blips no mapa).
 - **Como saber se o mod carregou**: o `SPA II.log` (pasta raiz do jogo) ganha, a cada abertura do jogo, `[STARTUP] SPA II iniciado | jogo <versao> | predios N | blips N` e depois `[STARTUP] primeiro tick executado`. Se essas linhas nao existirem, o SHVDN nao esta carregando o mod; se houver linhas `etapa ... falhou`, o erro esta descrito ali.
 
+## Revisao 4 (mover carros)
+- **Corrigido na ponte LemonUI**: o menu de Mover/Remover/Placa e o de escolha de vaga reabriam sozinhos, deixando dois menus abertos. A navegacao automatica agora so ocorre quando o menu ativado e o que fez o `BindMenuToItem` (as garagens vinculam itens que moram em outro menu).
+- **Corrigido (bug do mod original)**: `GetAvailableIndex` gerava uma vaga a mais que a capacidade; com a garagem cheia devolvia uma vaga invalida ou 0 (ja ocupada). Agora usa `GarageSlots.GetSlotForSave` (-1 = cheia) e reguardar um carro na propria garagem mantem a vaga dele.
+- **Troca/mover com rollback** (`GarageSlots.MoveToSlot`); vaga vazia no menu de gerenciamento nao gera mais erro; camera/marcador sincronizados ao reabrir menus.
+- **Auto-cura** de garagens com vagas duplicadas/invalidas (`GarageSlots.NormalizeSlots`, chamada em `LoadVehicles`).
+- Registro de IDs dos veiculos valida o modelo e esquece o handle ao deletar (o jogo reaproveita handles).
+- Logica de vagas coberta por 23.120 verificacoes automaticas (incluindo testes aleatorios). Nao testado dentro do jogo.
+

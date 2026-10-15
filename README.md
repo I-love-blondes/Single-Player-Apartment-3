@@ -48,7 +48,7 @@ That's it. If something doesn't work, jump to [Troubleshooting](#-troubleshootin
 
 | Component | Version |
 |---|---|
-| Release | rev3 (based on SPA II 2.0.5) |
+| Release | rev4 (based on SPA II 2.0.5) |
 | GTA V (Legacy) | `[FILL IN: right-click GTA5.exe → Properties → Details → Product version]` |
 | ScriptHookV | `[FILL IN: version of the ScriptHookV.dll you used]` |
 | ScriptHookVDotNet | v3.7.0-nightly.191 |
@@ -73,6 +73,8 @@ Whether it works for you depends mostly on **ScriptHookV and SHVDN supporting yo
 | Scaleform movies | 11 loaded at startup, never freed | **Loaded on demand, freed afterwards** |
 | Work per frame | Repeated for every property | **Once per frame, nearby properties only** |
 | Garage save files | Written directly to the target | **Written safely, validated, `.bak` kept** |
+| Moving / swapping cars between slots | Could reopen menus; a failed second write left two cars in one slot | **Safe move/swap with rollback** |
+| Garage slot assignment | Off-by-one: a full garage could assign an invalid or already-used slot | **Validated slots; broken garages repaired on load** |
 | A saved car whose DLC is missing | Could break loading | **Skipped and logged, XML kept** |
 | Startup failure in one part | Could stop the whole mod | **Isolated and logged** |
 
@@ -93,6 +95,9 @@ Whether it works for you depends mostly on **ScriptHookV and SHVDN supporting yo
 - **Per-vehicle error handling.** One broken car doesn't stop the rest from loading.
 - **Safer saving.** The old file is deleted only after the new one is saved. If something fails midway, the camera, HUD and screen fade are restored.
 - **No more indefinite waits.** Model loading, IPL swapping and interior loading have time limits.
+- **Moving cars between slots is reliable.** Moving or swapping a car now validates both saves and rolls back if the second one fails (no more two cars in one slot). Choosing an *empty* slot in the garage menu no longer throws an error, and the camera/marker follows the selection when you return to a menu.
+- **Fixed the slot allocation bug of the original.** SPA II computed one slot too many, so a **full** garage could assign a slot that does not exist or one that was already taken. Parking a car back into its own full garage now keeps its original slot, and a full garage correctly says it is full.
+- **Existing garages repair themselves.** Cars saved with an invalid or duplicated slot (for example by the old bug) are moved to a free slot when you enter the garage, and the change is logged.
 - **Fixed enter/exit cameras.** The apartment and garage camera transitions passed a Boolean where SHVDN3 expects a number (`True` became `-1`). They now pass `1`/`0`.
 - **Fault-tolerant startup.** Each startup step is isolated. A failure in one part is logged and doesn't stop the properties from loading. Missing `scripts\SPA II`, `Garages` and `Sounds` folders are created automatically.
 - **Startup is logged**, so you can confirm the mod is running.
@@ -243,13 +248,27 @@ During a long session `heap` and `pins` should level off instead of climbing.
 
 - [x] ✅ Buy a property at its for-sale sign through the purchase menu.
 - [x] ✅ Store several cars in a garage, leave, and confirm they are saved and present.
-- [x] ✅ Play 3+ hour with no crashes and no FPS problems.
-- [x] ✅ Check that stored cars keep their **mods and colors** after leaving and re-entering the garage.
-- [x] ✅ Walk away from a property and confirm it unloads (`loaded` drops in the `DebugMode` log).
-- [x] ✅ Enter a property you own, **change its style (IPL)**, and leave.
-- [x] ✅ Use 2, 6 and 10-car garages.
+- [x] ✅ Play 1+ hour with no crashes and no FPS problems.
+- [ ] **Move a car to an empty slot** (garage menu → car → Move → empty slot) and confirm only one menu is open afterwards.
+- [ ] **Swap two cars** and confirm they trade places.
+- [ ] **Fill a garage completely**, drive one of its cars out and park it back: it should return to its original slot.
+- [ ] Check that stored cars keep their **mods and colors** after leaving and re-entering the garage.
+- [ ] Walk away from a property and confirm it unloads (`loaded` drops in the `DebugMode` log).
+- [ ] Enter a property you own, **change its style (IPL)**, and leave.
+- [ ] Use 2, 6 and 10-car garages.
+- [ ] Uninstall the DLC of a saved car and enter the garage (other cars should load, and the XML should stay).
+- [ ] Open the closet/wardrobe, phone (mechanic/insurance) and real estate menus. Check that Back works and clothing previews update while browsing.
+- [ ] Play 1–2 hours with `DebugMode=True` and post the first and last `Janitor:` lines (`heap`, `pins`).
 
+---
 
+## 🐛 Reporting problems
+
+Open an issue and include:
+- Your **game build** (GTA5.exe → Properties → Details → Product version).
+- Your **ScriptHookV** and **SHVDN** versions.
+- `SPA II.log`, `ScriptHookVDotNet.log` and `ScriptHookV.log` (all in the game root).
+- What you were doing when it happened, and which menu if one was unresponsive.
 
 ---
 
@@ -287,4 +306,3 @@ New code lives in `SPAII/Core`:
 - **License note:** the original source repository did not include a license file, so the original author's rights apply by default. This project is shared as a community update with full credit. If the original author asks for changes or removal, they will be honored.
 
 *This is a fan-made update. It is not an official release of SPA II, and "SPA III" is a community name, not an announcement by the original author.*
-
