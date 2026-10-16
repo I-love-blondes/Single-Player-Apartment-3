@@ -186,73 +186,6 @@ scripts\
 
 ---
 
-## 🩺 Troubleshooting
-
-| Symptom | Likely cause and fix |
-|---|---|
-| **Nothing loads, no icons on the map** | ScriptHookV or SHVDN doesn't support your game build, or the files are mixed versions. Check your game version, update both, and recopy **all** `ScriptHookVDotNet*` files from the same package. |
-| **No `[STARTUP]` lines in `SPA II.log`** | SHVDN didn't load the mod. Check `ScriptHookVDotNet.log` and `ScriptHookV.log` in the game root. |
-| **Lines saying `etapa '...' falhou`** | One startup part failed. The message below it says which and why. Please report it. |
-| **Game closes when pressing F4** | F4 is the SHVDN console, and it crashes on mismatched or unsupported SHVDN files. Don't press it, and fix the versions. You can set `ConsoleKeyBinding=None` in `ScriptHookVDotNet.ini`. |
-| **A message asks you to check the script and for updates** | Usually a version mismatch. Update ScriptHookV and SHVDN to versions that support your game build. |
-| **Can't buy a property** | You must be at the **for-sale sign**, on foot, within ~1.5 m. The door doesn't sell. |
-| **Icons show but the purchase prompt never appears** | Look for a line starting with `LoadRuntime` in `SPA II.log` and report it. |
-| **Game closes when going online** | Expected with ScriptHookV. Remove `dinput8.dll` to play online. |
-
----
-
-## ⚙️ Configuration
-
-`scripts\SPA II\modconfig.ini`, section `[PERFORMANCE]` (created on first run):
-
-```ini
-[PERFORMANCE]
-UnloadDistance=250
-LoadDistance=200
-SweepIntervalMs=500
-MaxLoadsPerSweep=2
-InteriorReleaseGraceSec=20
-JanitorIntervalSec=30
-GcThresholdMB=150
-ForceGcMinutes=10
-ModelLoadTimeoutMs=3000
-InteriorReadyTimeoutMs=4000
-IplTimeoutMs=5000
-```
-
-| Setting | What it does |
-|---|---|
-| `UnloadDistance` / `LoadDistance` | Metres at which a property unloads / loads. `LoadDistance` is always kept below `UnloadDistance`. |
-| `SweepIntervalMs` | How often distances are checked. |
-| `MaxLoadsPerSweep` | Max properties loaded per check (smooths spikes in dense areas). |
-| `InteriorReleaseGraceSec` | Seconds an unused interior stays pinned before release. |
-| `JanitorIntervalSec` | How often the cleanup runs. |
-| `GcThresholdMB` / `ForceGcMinutes` | When to force a garbage collection. |
-| `*TimeoutMs` | Time limits for model, interior and IPL loading. |
-
-Invalid values are corrected automatically. To save more memory, lower `UnloadDistance`. If you get stutter arriving in a dense area, raise `SweepIntervalMs` or lower `MaxLoadsPerSweep`.
-
-**Measuring memory:** set `DebugMode=True` in the `[SETTING]` section. About every 30 seconds the log records:
-
-```
-Janitor: heap 87 MB | loaded 3/102 | pins 1 | menus 18 | tags 2 | outVeh 1
-```
-
-During a long session `heap` and `pins` should level off instead of climbing.
-
-
----
-
-## 🐛 Reporting problems
-
-Open an issue and include:
-- Your **game build** (GTA5.exe → Properties → Details → Product version).
-- Your **ScriptHookV** and **SHVDN** versions.
-- `SPA II.log`, `ScriptHookVDotNet.log` and `ScriptHookV.log` (all in the game root).
-- What you were doing when it happened, and which menu if one was unresponsive.
-
----
-
 ## 📌 Known limitations
 
 - Property blips stay on the map for all properties (they are the "for sale" icons). What is unloaded is menus, signs, props, interior pins and IPLs.
@@ -278,6 +211,10 @@ New code lives in `SPAII/Core`:
 | `VehicleCompat.vb`, `MetadataCompat.vb` | SHVDN3 vehicle API and the `Metadata.dll` replacement |
 
 ---
+
+## Attention:
+
+- The final version of SPA 3 will be sent out in the coming weeks. I hope you enjoy the improvements (of which there are many) applied to the offline Legacy version of GTA V.
 
 ## 🙏 Credits and legal
 
