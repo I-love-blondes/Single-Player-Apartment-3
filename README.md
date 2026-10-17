@@ -212,10 +212,6 @@ New code lives in `SPAII/Core`:
 
 ---
 
-## Attention:
-
-- The final version of SPA 3 will be sent out in the coming weeks. I hope you enjoy the improvements (of which there are many) applied to the offline Legacy version of GTA V.
-
 ## 🙏 Credits and legal
 
 - **SPA II** (Single Player Apartment Remastered): original work by **Zettabyte Technology**, © 2015–2021. All credit for the mod itself goes to the original author.
